@@ -5,7 +5,11 @@ function findCombination(
 	maxLength::Int,
 	available::Set{Int},
 )
-	println("update: ", solution, " available: ", available)
+	println("solution: ", solution, " available: ", available)
+
+	if length(solution) > maxLength || sum(solution) > totalSum 
+		return
+	end
 
 	if length(solution) == maxLength && sum(solution) == totalSum
 		push!(solutions, copy(solution))
@@ -14,11 +18,15 @@ function findCombination(
 
 	if !isempty(available)
 		for i in available
-			push!(solution, i)
-			findCombination(solutions, solution, totalSum, maxLength, filter(elem -> elem != i, available))
-			pop!(solution)
+			findCombination(solutions, union(solution, i), totalSum, maxLength, setdiff(available, [i]))
 		end
 	end
+end
+
+function processSolutions(solutions::Set{Set{Int}})
+	println("processing solutions...")
+	println("solutions: ", solutions)
+	return [sort!(collect(solution)) for solution in solutions]
 end
 
 function combinations_in_cage(totalSum::Int, maxLength::Int, fixed::Vector{Int} = Int[])
@@ -30,8 +38,6 @@ function combinations_in_cage(totalSum::Int, maxLength::Int, fixed::Vector{Int} 
 end
 
 # combinations_in_cage(10, 2)
-solutions = combinations_in_cage(5, 2, [1, 4, 5, 6, 7, 8])
+solutions = combinations_in_cage(45, 9) # == [[1, 2, 3, 4, 5, 6, 7, 8, 9]]
 
-for solution in solutions
-	println(solution)
-end
+
